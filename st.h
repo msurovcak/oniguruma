@@ -6,20 +6,23 @@
 
 #define ST_INCLUDED
 
+#ifdef _WIN32
+# include <windows.h>
+typedef ULONG_PTR st_data_t;
+#else
 typedef unsigned long st_data_t;
+#endif
 #define ST_DATA_T_DEFINED
-typedef st_data_t st_index_t;
-#define ST_INDEX_T_DEFINED
 
 typedef struct st_table st_table;
 
 struct st_hash_type {
     int (*compare)();
-    st_index_t (*hash)();
+    int (*hash)();
 };
 
 struct st_table {
-    const struct st_hash_type *type;
+    struct st_hash_type *type;
     int num_bins;
     int num_entries;
     struct st_table_entry **bins;
@@ -41,7 +44,7 @@ enum st_retval {ST_CONTINUE, ST_STOP, ST_DELETE, ST_CHECK};
 #endif
 
 st_table *st_init_table _((struct st_hash_type *));
-st_table *st_init_table_with_size _((const struct st_hash_type *, int));
+st_table *st_init_table_with_size _((struct st_hash_type *, int));
 st_table *st_init_numtable _((void));
 st_table *st_init_numtable_with_size _((int));
 st_table *st_init_strtable _((void));

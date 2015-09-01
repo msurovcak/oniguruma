@@ -48,137 +48,42 @@ static const int EncLen_EUCTW[] = {
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1
 };
 
-typedef enum { FAILURE = -2, ACCEPT = -1, S0 = 0, S1, S2, S3 } state_t;
-#define A ACCEPT
-#define F FAILURE
-static const signed char trans[][0x100] = {
-  { /* S0   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
-    /* 0 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 1 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 2 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 3 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 4 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 5 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 6 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 7 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, 2, F,
-    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* a */ F, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* b */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* c */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* d */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F
-  },
-  { /* S1   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
-    /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 1 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 2 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 3 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 4 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 5 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 6 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 7 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* a */ F, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* b */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* c */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* d */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* e */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* f */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, F
-  },
-  { /* S2   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
-    /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 1 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 2 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 3 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 4 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 5 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 6 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 7 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* a */ F, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-    /* b */ 3, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* c */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* d */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* e */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* f */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F
-  },
-  { /* S3   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
-    /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 1 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 2 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 3 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 4 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 5 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 6 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 7 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
-    /* a */ F, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* b */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* c */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* d */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F
-  }
-};
-#undef A
-#undef F
-
 static int
-euctw_mbc_enc_len(const UChar* p, const UChar* e, OnigEncoding enc ARG_UNUSED)
+euctw_mbc_enc_len(const UChar* p)
 {
-  int firstbyte = *p++;
-  state_t s = trans[0][firstbyte];
-#define RETURN(n) \
-    return s == ACCEPT ? ONIGENC_CONSTRUCT_MBCLEN_CHARFOUND(n) : \
-                         ONIGENC_CONSTRUCT_MBCLEN_INVALID()
-  if (s < 0) RETURN(1);
-  if (p == e) return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(EncLen_EUCTW[firstbyte]-1);
-  s = trans[s][*p++];
-  if (s < 0) RETURN(2);
-  if (p == e) return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(4-2);
-  s = trans[s][*p++];
-  if (s < 0) RETURN(3);
-  if (p == e) return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(4-3);
-  s = trans[s][*p++];
-  RETURN(4);
-#undef RETURN
+  return EncLen_EUCTW[*p];
 }
 
 static OnigCodePoint
-euctw_mbc_to_code(const UChar* p, const UChar* end, OnigEncoding enc ARG_UNUSED)
+euctw_mbc_to_code(const UChar* p, const UChar* end)
 {
-  return onigenc_mbn_mbc_to_code(enc, p, end);
+  return onigenc_mbn_mbc_to_code(ONIG_ENCODING_EUC_TW, p, end);
 }
 
 static int
-euctw_code_to_mbc(OnigCodePoint code, UChar *buf, OnigEncoding enc)
+euctw_code_to_mbc(OnigCodePoint code, UChar *buf)
 {
-  return onigenc_mb4_code_to_mbc(enc, code, buf);
+  return onigenc_mb4_code_to_mbc(ONIG_ENCODING_EUC_TW, code, buf);
 }
 
 static int
 euctw_mbc_case_fold(OnigCaseFoldType flag, const UChar** pp, const UChar* end,
-                    UChar* lower, OnigEncoding enc)
+                    UChar* lower)
 {
-  return onigenc_mbn_mbc_case_fold(enc, flag,
+  return onigenc_mbn_mbc_case_fold(ONIG_ENCODING_EUC_TW, flag,
                                    pp, end, lower);
 }
 
 static int
-euctw_is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc)
+euctw_is_code_ctype(OnigCodePoint code, unsigned int ctype)
 {
-  return onigenc_mb4_is_code_ctype(enc, code, ctype);
+  return onigenc_mb4_is_code_ctype(ONIG_ENCODING_EUC_TW, code, ctype);
 }
 
 #define euctw_islead(c)    ((UChar )((c) - 0xa1) > 0xfe - 0xa1)
 
 static UChar*
-euctw_left_adjust_char_head(const UChar* start, const UChar* s, const UChar* end, OnigEncoding enc)
+euctw_left_adjust_char_head(const UChar* start, const UChar* s)
 {
   /* Assumed in this encoding,
      mb-trail bytes don't mix with single bytes.
@@ -190,21 +95,21 @@ euctw_left_adjust_char_head(const UChar* start, const UChar* s, const UChar* end
   p = s;
 
   while (!euctw_islead(*p) && p > start) p--;
-  len = enclen(enc, p, end);
+  len = enclen(ONIG_ENCODING_EUC_TW, p);
   if (p + len > s) return (UChar* )p;
   p += len;
   return (UChar* )(p + ((s - p) & ~1));
 }
 
 static int
-euctw_is_allowed_reverse_match(const UChar* s, const UChar* end ARG_UNUSED, OnigEncoding enc ARG_UNUSED)
+euctw_is_allowed_reverse_match(const UChar* s, const UChar* end ARG_UNUSED)
 {
   const UChar c = *s;
   if (c <= 0x7e) return TRUE;
   else           return FALSE;
 }
 
-OnigEncodingDefine(euc_tw, EUC_TW) = {
+OnigEncodingType OnigEncodingEUC_TW = {
   euctw_mbc_enc_len,
   "EUC-TW",   /* name */
   4,          /* max enc length */
@@ -220,9 +125,5 @@ OnigEncodingDefine(euc_tw, EUC_TW) = {
   euctw_is_code_ctype,
   onigenc_not_support_get_ctype_code_range,
   euctw_left_adjust_char_head,
-  euctw_is_allowed_reverse_match,
-  0,
-  ONIGENC_FLAG_NONE,
+  euctw_is_allowed_reverse_match
 };
-ENC_DEFINE("EUC-TW", EUC_TW)
-ENC_ALIAS("eucTW", "EUC-TW")

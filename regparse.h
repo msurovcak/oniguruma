@@ -1,11 +1,10 @@
-#ifndef ONIGURUMA_REGPARSE_H
-#define ONIGURUMA_REGPARSE_H
+#ifndef REGPARSE_H
+#define REGPARSE_H
 /**********************************************************************
-  regparse.h -  Onigmo (Oniguruma-mod) (regular expression library)
+  regparse.h -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +30,6 @@
  */
 
 #include "regint.h"
-
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility push(default)
-#endif
 
 /* node type */
 #define NT_STR         0
@@ -92,7 +87,6 @@
 #define ENCLOSE_MEMORY           (1<<0)
 #define ENCLOSE_OPTION           (1<<1)
 #define ENCLOSE_STOP_BACKTRACK   (1<<2)
-#define ENCLOSE_CONDITION        (1<<3)
 
 #define NODE_STR_MARGIN         16
 #define NODE_STR_BUF_SIZE       24  /* sizeof(CClassNode) - sizeof(int)*4 */
@@ -102,7 +96,7 @@
 #define NSTR_AMBIG              (1<<1)
 #define NSTR_DONT_GET_OPT_INFO  (1<<2)
 
-#define NSTRING_LEN(node) (OnigDistance )((node)->u.str.end - (node)->u.str.s)
+#define NSTRING_LEN(node)             ((node)->u.str.end - (node)->u.str.s)
 #define NSTRING_SET_RAW(node)          (node)->u.str.flag |= NSTR_RAW
 #define NSTRING_CLEAR_RAW(node)        (node)->u.str.flag &= ~NSTR_RAW
 #define NSTRING_SET_AMBIG(node)        (node)->u.str.flag |= NSTR_AMBIG
@@ -152,7 +146,6 @@
 #define IS_ENCLOSE_STOP_BT_SIMPLE_REPEAT(en) \
     (((en)->state & NST_STOP_BT_SIMPLE_REPEAT) != 0)
 #define IS_ENCLOSE_NAMED_GROUP(en)     (((en)->state & NST_NAMED_GROUP)   != 0)
-#define IS_ENCLOSE_NAME_REF(en)        (((en)->state & NST_NAME_REF)      != 0)
 
 #define SET_CALL_RECURSION(node)       (node)->u.call.state |= NST_RECURSION
 #define IS_CALL_RECURSION(cn)          (((cn)->state & NST_RECURSION)  != 0)
@@ -199,7 +192,7 @@ typedef struct {
   AbsAddrType    call_addr;
   /* for multiple call reference */
   OnigDistance min_len; /* min length (byte) */
-  OnigDistance max_len; /* max length (byte) */
+  OnigDistance max_len; /* max length (byte) */ 
   int char_len;         /* character length  */
   int opt_count;        /* referenced count in optimize_node_left() */
 } EncloseNode;
@@ -243,7 +236,6 @@ typedef struct {
   int type;
   struct _Node* target;
   int char_len;
-  int ascii_range;
 } AnchorNode;
 
 typedef struct {
@@ -256,7 +248,6 @@ typedef struct {
   NodeBase base;
   int ctype;
   int not;
-  int ascii_range;
 } CtypeNode;
 
 typedef struct _Node {
@@ -288,7 +279,7 @@ typedef struct {
   OnigOptionType   option;
   OnigCaseFoldType case_fold_flag;
   OnigEncoding     enc;
-  const OnigSyntaxType* syntax;
+  OnigSyntaxType*  syntax;
   BitStatusType    capture_history;
   BitStatusType    bt_mem_start;
   BitStatusType    bt_mem_end;
@@ -315,9 +306,6 @@ typedef struct {
   int curr_max_regnum;
   int has_recursion;
 #endif
-  int warnings_flag;
-  const char* sourcefile;
-  int sourceline;
 } ScanEnv;
 
 
@@ -360,8 +348,4 @@ extern int onig_print_names(FILE*, regex_t*);
 #endif
 #endif
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility pop
-#endif
-
-#endif /* ONIGURUMA_REGPARSE_H */
+#endif /* REGPARSE_H */
